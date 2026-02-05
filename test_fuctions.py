@@ -80,11 +80,80 @@ def test_add_parametrized(age, expected):
     assert get_age_group(age) == expected 
 
 #задача3 
+import pytest
+from functions import calculate_cart_total
+
 @pytest.fixture
-def sample_user_data():
-    """Фикстура, которая возвращает словарь с данными пользователя."""
-    return {
-    "first_name": "Jane",
-    "last_name": "Doe",
-    "email": "jane.doe@example.com"
-    }
+def sample_cart():
+    return [
+    {"name": "Товар 1", "price": 10.0, "quantity": 2},
+    {"name": "Товар 2", "price": 5.0, "quantity": 3},
+    {"name": "Товар 3", "price": 20.0, "quantity": 1},
+    ]
+
+def test_calculate_total_correctness(sample_cart):
+    expected_total = (
+        10.0 * 2 +
+        5.0 * 3 +
+        20.0 * 1
+    )
+    total = calculate_cart_total(sample_cart)
+    assert total == expected_total
+
+def test_cart_contains_specific_item(sample_cart):
+    item_names = [item["name"] for item in sample_cart]
+    assert "Товар 2" in item_names
+    assert "Товар 1" in item_names
+    assert "Товар 3" in item_names
+
+ #задача4
+from functions import get_value_from_dict
+def test_get_value():
+    dict = {"name": "Товар 3", "quanity": 1}
+    assert get_value_from_dict(dict, "name" ) == "Товар 3"
+    assert get_value_from_dict(dict, "quanity" ) == 1
+
+def test_get_value_raises_error():
+    dict = {"name": "Товар 3", "quanity": 1}
+    with pytest.raises(KeyError):
+        get_value_from_dict(dict,"none")
+
+#5
+import pytest 
+from functions import Wallet, InsufficientFundsError
+
+@pytest.fixture
+def wallet():
+   return Wallet(initial_balance=20.0)
+
+def test_wallet_deposit(wallet):
+    wallet.deposit(30.0)
+    assert wallet.balance == 50.0
+
+def test_wallet_withdraw(wallet):
+    wallet.withdraw(10.0)
+    assert wallet.balance == 10.0
+
+def test_wallet_insufficient_funds(wallet):
+    with pytest.raises(InsufficientFundsError):
+        wallet.withdraw(100.0)
+
+wallet_test_cases = [
+    ("__init__", -10.0),
+    ("deposit", 0.0),
+    ("withdraw", -5.0)
+]
+
+@pytest.mark.parametrize("method, amount", wallet_test_cases)
+def test_wallet_value_error(method,amount):
+    if method == "__init__" :
+        with pytest.raises(ValueError):
+            Wallet(initial_balance=amount)
+    else:
+        wallet = Wallet(initial_balance=20.0)
+        if method == "deposit":
+            with pytest.raises(ValueError):
+                wallet.deposit(amount)
+        elif method == "withdraw":
+            with pytest.raises(ValueError):
+                wallet.withdraw(amount)

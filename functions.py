@@ -61,7 +61,7 @@ def get_value_from_dict(data_dict: dict, key: str):
     """
     return data_dict[key]
 
-#задача 4
+#задача 5
 class InsufficientFundsError(Exception):
     """Исключение, вызываемое при нехватке средств."""
     pass
@@ -80,3 +80,4 @@ class Wallet:
         if amount > self.balance:
             raise InsufficientFundsError("Недостаточно средств на счете.")
         self.balance -= amount
+        
